@@ -24,6 +24,10 @@ class SongCloud
     song = "a song";
     artist = "singer songwriter";
   }
+  
+  void updateUsername(String prov) {
+   username = prov; 
+  }
 
   void updatePosition(float x, float y) {
     xPos = x;

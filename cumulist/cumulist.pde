@@ -24,6 +24,8 @@ ArrayList <SongCloud> songs;
 Substrate substrate;
 ArrayList<CustomCursor> cursors;
 
+Pointer photoPointer;
+
 /****************************
  Setup
  *****************************/
@@ -67,11 +69,15 @@ void draw()
   {
     for ( SongCloud s : songs )
     {
-      if (s.isColliding(c.x, c.y))
+      if (s.isColliding(c.x, c.y) && c.dragging)
       {
         //println(c.x + c.y);
         s.updateUserColor(c.fillColor);
+        s.updateUsername(c.pointer.provenance());
         s.updatePosition(c.x, c.y);
+        s.updateUserImage(c.photo);
+        println(c.dragging);
+
         //s.updateUser(c.pointer.provenance);
       }
     }
@@ -96,9 +102,9 @@ void newClouds()
 {
   for (SongCloud s : songs )
   {
-    if( s.playlistLoc == -1)
+    if ( s.playlistLoc == -1)
       songs.remove(s);
-      println("removed " + s);
+    println("removed " + s);
   }
   for ( int i=0; i<8; i++ ) {
     songs.add( new SongCloud(random(10, width/4), random(20, height-300) ) );
@@ -136,6 +142,24 @@ void pointerVanished(Pointer p)
   }
 }
 
+void pointerHardened( Pointer p )
+{
+  for ( CustomCursor c : cursors )
+  {
+    if (c.pointer.provenance() == p.provenance())
+      c.dragging = true;
+  }
+}
+
+void pointerSoftened( Pointer p )
+{
+  for ( CustomCursor c : cursors )
+  {
+    if (c.pointer.provenance() == p.provenance())
+      c.dragging = false;
+  }
+}
+
 void pointerSwipedRight(Pointer p)
 {
   newClouds();
@@ -149,6 +173,7 @@ void pointerSwipedLeft(Pointer p)
 void pointerSwipedUp(Pointer p)
 {
   substrate.requestImage(p);
+  photoPointer = p;
 }
 
 void pointerSwipedDown(Pointer p)
@@ -171,6 +196,18 @@ void imageIngested(PImage img)
   testPhoto = img; // if the mask changes every frame, we need to use a copy of it, keeping the original intact
   testPhoto.mask(maskImage);
 
-  //sc.updateUserImage(testPhoto);
+  for ( CustomCursor c : cursors )
+  {
+    if ( c.pointer.provenance() == photoPointer.provenance() ) {
+      c.addPhoto(testPhoto);
+    }
+  }
+  
+  for ( SongCloud s : songs )
+  {
+    if ( s.username == photoPointer.provenance() ) {
+      s.updateUserImage(testPhoto);
+    }
+  }
 }
 

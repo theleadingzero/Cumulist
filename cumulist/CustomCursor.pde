@@ -5,6 +5,8 @@ public class CustomCursor
   float x, y;
   color fillColor;
   Pointer pointer;
+  boolean dragging;
+  PImage photo;
   
   CustomCursor( Pointer p )
   { // pointer should tell this cursor when events occur
@@ -13,6 +15,13 @@ public class CustomCursor
     y = p.y();
     fillColor = color( random(255), 100, 200 );
     pointer = p;
+    
+    photo = loadImage("user.png");
+  }
+  
+  void addPhoto(PImage newPhoto) 
+  {
+   photo = newPhoto; 
   }
 
   void draw()
